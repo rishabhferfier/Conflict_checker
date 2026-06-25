@@ -5,10 +5,10 @@ from fastapi.responses import FileResponse
 from pathlib import Path
 
 # Import DB Base + engine
-from app.db.database import Base, engine
-from app.routes import analyze
+from db.database import Base, engine
+from routes import analyze
 # Import models
-from app.db import models
+from db import models
 
 # Create tables automatically
 Base.metadata.create_all(bind=engine)
