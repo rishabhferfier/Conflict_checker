@@ -1,0 +1,11 @@
+{
+  "tickets": [
+    {
+      "id": "PROJ-001",
+      "title": "Sample JIRA Ticket",
+      "description": "This is a sample JIRA ticket for testing",
+      "status": "open",
+      "assignee": "user@example.com"
+    }
+  ]
+}
