@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ConflictGuard AI - Requirement Conflict Detection Agent</title>
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/static/styles.css">
+</head>
+<body>
+  <!-- Mesh background highlights -->
+  <div class="bg-glow bg-glow-purple"></div>
+  <div class="bg-glow bg-glow-blue"></div>
+
+  <div class="app-container">
+    <!-- Top Navigation Header -->
+    <header class="app-header">
+      <div class="header-brand">
+        <div class="logo-container">
+          <svg class="app-logo" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+            <path d="M12 8v4"/>
+            <path d="M12 16h.01"/>
+          </svg>
+        </div>
+        <div class="brand-text">
+          <span class="brand-title">ConflictGuard <span class="badge-tag">AI</span></span>
+          <span class="brand-subtitle">Enterprise Requirements Auditor</span>
+        </div>
+      </div>
+      
+      <div class="header-status">
+        <span class="status-indicator" id="systemStatus">
+          <span class="status-dot"></span>
+          <span class="status-text">Checking connection...</span>
+        </span>
+      </div>
+    </header>
+
+    <!-- Main App Layout -->
+    <main class="app-workspace">
+      <!-- Left Panel: Form & Actions -->
+      <section class="input-panel">
+        <div class="panel-card">
+          <div class="panel-header">
+            <h2>Audit New Requirement</h2>
+            <p>Input your draft requirement or feature spec below. ConflictGuard will cross-reference your specification with historical tickets in the backlog to identify contradictions, architectural risks, and dependency overlaps.</p>
+          </div>
+
+          <form id="auditForm" class="audit-form">
+            <div class="form-group">
+              <label for="requirementInput">Specification Description</label>
+              <textarea 
+                id="requirementInput" 
+                placeholder="Describe the new workflow, business rule, database change, or API implementation..."
+                required
+              ></textarea>
+            </div>
+
+            <button type="submit" id="submitBtn" class="btn btn-primary">
+              <span>Run Conflict Audit</span>
+              <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <line x1="5" y1="12" x2="19" y2="12"></line>
+                <polyline points="12 5 19 12 12 19"></polyline>
+              </svg>
+            </button>
+          </form>
+
+          <!-- Sample Specifications -->
+          <div class="sample-templates-section">
+            <h3>Try a Sample Specification</h3>
+            <div class="sample-grid">
+              <button class="sample-card" id="sampleWalletBtn">
+                <div class="sample-icon wallet-icon">💳</div>
+                <div class="sample-body">
+                  <h4>Virtual Wallet Refunds</h4>
+                  <p>Store returned funds in virtual wallets rather than processing refund requests back to Stripe APIs.</p>
+                </div>
+              </button>
+
+              <button class="sample-card" id="sampleSessionBtn">
+                <div class="sample-icon key-icon">🔑</div>
+                <div class="sample-body">
+                  <h4>Extend Auth Session</h4>
+                  <p>Increase session timeout to 24 hours via unsecured cookies for better user retention.</p>
+                </div>
+              </button>
+
+              <button class="sample-card" id="sampleAuditBtn">
+                <div class="sample-icon audit-icon">📝</div>
+                <div class="sample-body">
+                  <h4>Bypass Audit Logging</h4>
+                  <p>Implement high-speed billing operations that skip audit logging databases to maximize throughput.</p>
+                </div>
+              </button>
+            </div>
+          </div>
+
+          <!-- Timeline Loading Overlay -->
+          <div id="loaderOverlay" class="loader-overlay" style="display: none;">
+            <div class="loader-content">
+              <div class="spinner-container">
+                <div class="glowing-spinner"></div>
+              </div>
+              <h3 id="loaderTitle">Initiating Conflict Scan</h3>
+              <p id="loaderMessage">Connecting to AI reasoning agent...</p>
+              
+              <div class="audit-steps">
+                <div class="audit-step" id="stepRetrieve">
+                  <div class="step-dot"></div>
+                  <span>ChromaDB Vector Retrieval</span>
+                </div>
+                <div class="audit-step" id="stepReason">
+                  <div class="step-dot"></div>
+                  <span>Llama-3 LLM Audit reasoning</span>
+                </div>
+                <div class="audit-step" id="stepReport">
+                  <div class="step-dot"></div>
+                  <span>Formatting report nodes</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Right Panel: Results & Dashboard -->
+      <section class="results-panel">
+        <!-- Empty State Dashboard -->
+        <div id="emptyDashboard" class="empty-dashboard-card">
+          <div class="empty-art">
+            <svg class="empty-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+              <circle cx="12" cy="12" r="10"/>
+              <path d="M12 16v-4"/>
+              <path d="M8 12h8"/>
+            </svg>
+          </div>
+          <h3>System Idle</h3>
+          <p>Submit a requirement on the left panel to trigger the AI conflict checking pipeline. The analysis will display historical ticket overlaps, security constraints, and recommended engineering tasks.</p>
+        </div>
+
+        <!-- Full Results Panel -->
+        <div id="analysisDashboard" class="analysis-dashboard" style="display: none;">
+          <!-- Risk Severity Panel -->
+          <div id="riskCard" class="risk-card risk-low">
+            <div class="risk-badge-container">
+              <span class="risk-badge-label">Requirement Status</span>
+              <div id="riskBadge" class="risk-level-badge">Awaiting scan</div>
+            </div>
+            <div class="risk-details">
+              <h4>System Audit Assessment</h4>
+              <p id="riskDescription">Submit a requirement to check whether it already exists, overlaps with the backlog, or is new.</p>
+            </div>
+          </div>
+
+          <!-- Action Bar -->
+          <div class="dashboard-action-bar">
+            <div class="action-tabs">
+              <button class="tab-btn active" data-tab="tab-overview">Overview</button>
+              <button class="tab-btn" data-tab="tab-report">AI Analysis Report</button>
+              <button class="tab-btn" data-tab="tab-tickets">Backlog Matches (<span id="ticketCountBadge">0</span>)</button>
+              <button class="tab-btn" data-tab="tab-checklist">Action Items</button>
+            </div>
+
+            <div class="action-exports">
+              <button id="copyMarkdownBtn" class="btn btn-secondary btn-sm" title="Copy report as markdown">
+                <svg class="btn-icon-mini" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/>
+                  <rect x="8" y="2" width="8" height="4" rx="1" ry="1"/>
+                </svg>
+                Copy Markdown
+              </button>
+              <button id="downloadPdfBtn" class="btn btn-primary btn-sm" title="Download PDF report" disabled>
+                <svg class="btn-icon-mini" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                  <polyline points="7 10 12 15 17 10"/>
+                  <line x1="12" y1="15" x2="12" y2="3"/>
+                </svg>
+                Download PDF
+              </button>
+            </div>
+          </div>
+
+          <!-- Tab Content Sections -->
+          <div class="tab-content-container">
+            <!-- Tab: Overview -->
+            <div id="tab-overview" class="tab-pane active">
+              <div class="overview-grid">
+                <!-- Summary Card -->
+                <div class="dashboard-panel-card">
+                  <div class="card-title">
+                    <svg class="panel-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                      <polyline points="14 2 14 8 20 8"/>
+                      <line x1="16" y1="13" x2="8" y2="13"/>
+                      <line x1="16" y1="17" x2="8" y2="17"/>
+                      <polyline points="10 9 9 9 8 9"/>
+                    </svg>
+                    <h3>Requirement Summary</h3>
+                  </div>
+                  <div class="card-body">
+                    <p id="summaryText" class="summary-paragraph">Extracting requirement specification details...</p>
+                  </div>
+                </div>
+
+                <!-- Impacted Modules Card -->
+                <div class="dashboard-panel-card">
+                  <div class="card-title">
+                    <svg class="panel-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/>
+                      <polyline points="3.27 6.96 12 12.01 20.73 6.96"/>
+                      <line x1="12" y1="22.08" x2="12" y2="12"/>
+                    </svg>
+                    <h3>Impacted Modules</h3>
+                  </div>
+                  <div class="card-body">
+                    <div id="modulesContainer" class="chips-container">
+                      <span class="chip chip-gray">None detected</span>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Conflicts Overlap Card -->
+                <div class="dashboard-panel-card full-width">
+                  <div class="card-title">
+                    <svg class="panel-icon text-amber" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/>
+                      <line x1="12" y1="9" x2="12" y2="13"/>
+                      <line x1="12" y1="17" x2="12.01" y2="17"/>
+                    </svg>
+                    <h3>Contradictions & Duplicate Features</h3>
+                  </div>
+                  <div class="card-body">
+                    <ul id="conflictsList" class="insights-list">
+                      <li>No conflicts identified.</li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Tab: Detailed Report (Rendered Markdown) -->
+            <div id="tab-report" class="tab-pane">
+              <div class="markdown-viewer-card">
+                <div class="viewer-header">
+                  <span class="header-label">AI Agent Analysis Report (Markdown)</span>
+                </div>
+                <div id="markdownContent" class="markdown-body">
+                  <!-- Rendered Markdown goes here -->
+                </div>
+              </div>
+            </div>
+
+            <!-- Tab: Backlog Matches (ChromaDB retrieved tickets) -->
+            <div id="tab-tickets" class="tab-pane">
+              <div class="tickets-grid-header">
+                <h3>Historical Backlog References</h3>
+                <p>These tickets were semantically retrieved from ChromaDB based on embedding similarity.</p>
+              </div>
+              <div id="ticketsGrid" class="tickets-grid">
+                <!-- Ticket cards injected here -->
+              </div>
+            </div>
+
+            <!-- Tab: Recommended Actions Checklist -->
+            <div id="tab-checklist" class="tab-pane">
+              <div class="checklist-header-card">
+                <div class="checklist-progress">
+                  <div class="checklist-info">
+                    <h3>Engineering Audit Checklist</h3>
+                    <p id="checklistProgressText">0 of 0 tasks completed</p>
+                  </div>
+                  <div class="progress-bar-bg">
+                    <div id="checklistProgressBar" class="progress-bar-fill" style="width: 0%;"></div>
+                  </div>
+                </div>
+              </div>
+              <ul id="checklistItems" class="custom-checklist">
+                <!-- Action checklist items injected here -->
+              </ul>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <!-- Global Toast Alerts -->
+  <div id="toastAlert" class="toast-alert" role="alert">Copied to clipboard!</div>
+
+  <script src="/static/app.js"></script>
+</body>
+</html>
