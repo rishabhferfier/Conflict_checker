@@ -2,8 +2,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse
-from pathlib import Path
-
+import os
 # Import DB Base + engine
 from db.database import Base, engine
 from routes import analyze
@@ -28,12 +27,9 @@ app.add_middleware(
 
 app.include_router(analyze.router, prefix="/api/v1")
 
-# Resolve path to frontend/app static folder
-FRONTEND_DIR = Path(__file__).resolve().parent.parent / "frontend" / "app"
-
-# Mount static assets
+FRONTEND_DIR = os.path.join(os.path.dirname(__file__), "../frontend")
 app.mount("/static", StaticFiles(directory=FRONTEND_DIR), name="static")
 
 @app.get("/")
 def home():
-    return FileResponse(FRONTEND_DIR / "index.html")
+    return FileResponse(os.path.join(FRONTEND_DIR, "index.html"))
