@@ -29,7 +29,7 @@ app.add_middleware(
 app.include_router(analyze.router, prefix="/api/v1")
 
 # Resolve path to frontend/app static folder
-FRONTEND_DIR = Path(__file__).resolve().parent.parent.parent / "frontend" / "app"
+FRONTEND_DIR = Path(__file__).resolve().parent.parent / "frontend" / "app"
 
 # Mount static assets
 app.mount("/static", StaticFiles(directory=FRONTEND_DIR), name="static")

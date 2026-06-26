@@ -1,6 +1,6 @@
 from sqlalchemy import Column, Integer, String, Text
 
-from app.db.database import Base
+from db.database import Base
 
 # ----------------------------------------
 # Existing JIRA Tickets
@@ -16,11 +16,7 @@ class JiraTicket(Base):
     module=Column(String)
     status=Column(String)
     created_at=Column(String)
-
-# ----------------------------------------
-# AI Generated Reports
-# ----------------------------------------
-
+    
 class AnalysisReport(Base):
 
     __tablename__ = "analysis_reports"

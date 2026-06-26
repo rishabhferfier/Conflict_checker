@@ -4,11 +4,11 @@ from fastapi.responses import StreamingResponse, JSONResponse
 
 from pydantic import BaseModel
 
-from app.services.vector_store import (
+from services.vector_store import (
     retrieve_similar_tickets
 )
 
-from app.services.conflict_agent import (
+from services.conflict_agent import (
     analyze_conflicts
 )
 
@@ -19,62 +19,39 @@ class AnalyzeRequest(BaseModel):
 
     requirement: str
 
-
 @router.post("/analyze")
-def analyze_requirement(
-
-    request: AnalyzeRequest
-):
-
+def analyze_requirement(request: AnalyzeRequest):
     requirement = request.requirement
-
+    
     # Semantic retrieval
-    similar_tickets = (
-        retrieve_similar_tickets(
-            requirement
-        )
-    )
-
+    similar_tickets = retrieve_similar_tickets(requirement)
+    
     # No overlap found
     if not similar_tickets:
-
         return {
-
             "requirement": requirement,
-
             "conflict_detected": False,
-
             "message": "No relevant historical conflicts found.",
-
             "risk_level": "Low",
-
             "conflict_level": "New Requirement",
-
-            "best_distance": None
+            "best_distance": None,
+            "ai_analysis": "No similar tickets to analyze."
         }
-
-    # AI reasoning (returns structured result with conflict level)
-    analysis_result = analyze_conflicts(
-
-        requirement,
-
-        similar_tickets
-    )
-
-    # analysis_result is a dict: {conflict_level, conflict_message, best_distance, ai_analysis}
+    
+    # AI reasoning with structured result
+    analysis_result = analyze_conflicts(requirement, similar_tickets)
+    
     return {
-
         "requirement": requirement,
-
-        "retrieved_tickets": similar_tickets,
-
+        "retrieved_tickets_count": len(similar_tickets),
+        "retrieved_tickets": similar_tickets[:5],  # Limit response size
         "conflict_level": analysis_result.get("conflict_level"),
-
         "conflict_message": analysis_result.get("conflict_message"),
-
+        "risk_level": analysis_result.get("risk_level"),
         "best_distance": analysis_result.get("best_distance"),
-
-        "ai_analysis": analysis_result.get("ai_analysis")
+        "avg_distance": analysis_result.get("avg_distance"),
+        "ai_analysis": analysis_result.get("ai_analysis"),
+        "analyzed_tickets": analysis_result.get("analyzed_tickets")
     }
 
 
